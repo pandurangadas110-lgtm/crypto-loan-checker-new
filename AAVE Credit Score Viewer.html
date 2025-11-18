@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<!-- saved from url=(0042)http://127.0.0.1:5500/templates/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style>
+  
+  <title>AAVE Credit Score Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #020617;
+      color: #e5e7eb;
+    }
+    .container {
+      width: 100%;
+      max-width: 900px;
+      padding: 20px;
+    }
+    .card {
+      background: #020617;
+      border-radius: 16px;
+      padding: 20px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.8);
+    }
+    .header {
+      margin-bottom: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .header h1 {
+      font-size: 1.4rem;
+    }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.8);
+      color: #7dd3fc;
+      font-size: 0.7rem;
+    }
+    label {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      display: block;
+    }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: #020617;
+      color: #e5e7eb;
+      outline: none;
+      font-size: 0.9rem;
+    }
+    input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+    button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #f9fafb;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.6);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .hint {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    .result-card {
+      margin-top: 18px;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.95);
+    }
+    .score-highlight {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      margin-bottom: 10px;
+    }
+    .tag.good {
+      background: rgba(22, 163, 74, 0.1);
+      color: #86efac;
+      border: 1px solid rgba(22, 163, 74, 0.7);
+    }
+    .tag.medium {
+      background: rgba(234, 179, 8, 0.1);
+      color: #fde68a;
+      border: 1px solid rgba(234, 179, 8, 0.7);
+    }
+    .tag.bad {
+      background: rgba(248, 113, 113, 0.1);
+      color: #fecaca;
+      border: 1px solid rgba(248, 113, 113, 0.7);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.85rem;
+    }
+    th, td {
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+    }
+    th {
+      text-align: left;
+      color: #9ca3af;
+      width: 40%;
+    }
+    .error {
+      margin-top: 10px;
+      font-size: 0.8rem;
+      color: #fecaca;
+    }
+    .loader {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: #93c5fd;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <h1>AAVE Wallet Credit Score</h1>
+        <div class="badge">Frontend • Uses your backend API</div>
+      </div>
+
+      <label for="wallet">Wallet address</label>
+      <input id="wallet" type="text" placeholder="0x1234...abcd">
+      <div class="hint">
+        Enter any wallet address that your backend supports.
+      </div>
+      <button id="checkBtn">Fetch details &amp; score</button>
+      <div id="loader" class="loader" style="display: none;">Fetching data from backend…</div>
+      <div id="error" class="error" style="display: none;">Failed to fetch wallet data from backend. Check if API is running and URL is correct.</div>
+
+      <div id="result" class="result-card" style="display: block;">
+        <div id="scoreBlock">
+          <div class="score-highlight" id="scoreValue">898.00 / 100</div>
+          <div id="scoreTag"><span class="tag good">Good / Low Risk</span></div>
+        </div>
+        <table id="detailsTable"><tr><th>action_diversity</th><td>4</td></tr><tr><th>activity_days</th><td>39.28017361111111</td></tr><tr><th>credit_score</th><td>898</td></tr><tr><th>ml_credit_score</th><td>898.07</td></tr><tr><th>normalized_credit_score_0_100</th><td>89.8</td></tr><tr><th>num_borrows</th><td>8</td></tr><tr><th>num_deposits</th><td>7</td></tr><tr><th>num_liquidations</th><td>0</td></tr><tr><th>num_repays</th><td>5</td></tr><tr><th>num_transactions</th><td>25</td></tr><tr><th>repay_ratio</th><td>1.0007607859377612</td></tr><tr><th>total_borrow_usd</th><td>11631.431210321323</td></tr><tr><th>total_deposit_usd</th><td>18390665686010520</td></tr><tr><th>total_repay_usd</th><td>11640.280239622172</td></tr><tr><th>wallet</th><td>0x000000000a38444e0a6e37d3b630d7e855a7cb13</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 👉 Change this if your backend runs on another URL/port
+    const API_BASE = "http://localhost:5000/api";
+
+    const walletInput = document.getElementById("wallet");
+    const checkBtn = document.getElementById("checkBtn");
+    const errorEl = document.getElementById("error");
+    const loaderEl = document.getElementById("loader");
+    const resultCard = document.getElementById("result");
+    const scoreValueEl = document.getElementById("scoreValue");
+    const scoreTagEl = document.getElementById("scoreTag");
+    const detailsTable = document.getElementById("detailsTable");
+
+    function setLoading(isLoading) {
+      loaderEl.style.display = isLoading ? "block" : "none";
+      checkBtn.disabled = isLoading;
+    }
+
+    function classifyScore(score) {
+      if (score >= 75) return { tag: "Good / Low Risk", cls: "good" };
+      if (score >= 55) return { tag: "Medium Risk", cls: "medium" };
+      return { tag: "High Risk", cls: "bad" };
+    }
+
+    async function fetchWallet() {
+      const address = walletInput.value.trim();
+      errorEl.style.display = "none";
+      resultCard.style.display = "none";
+
+      if (!address) {
+        errorEl.textContent = "Please enter a wallet address.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch(`${API_BASE}/wallet/${address}`);
+        if (!res.ok) {
+          throw new Error(`Backend returned ${res.status}`);
+        }
+        const data = await res.json();
+
+        // Expecting something like:
+        // { wallet_address: "...", credit_score: 72.5, total_collateral_usd: ..., ... }
+
+        // Highlight credit score (if present)
+        const score = data.credit_score ?? data.score ?? null;
+        if (score === null) {
+          scoreValueEl.textContent = "No score";
+          scoreTagEl.innerHTML = "";
+        } else {
+          scoreValueEl.textContent = `${score.toFixed ? score.toFixed(2) : score} / 100`;
+          const info = classifyScore(Number(score));
+          scoreTagEl.innerHTML = `<span class="tag ${info.cls}">${info.tag}</span>`;
+        }
+
+        // Fill details table with all key/value pairs
+        detailsTable.innerHTML = "";
+        Object.keys(data).forEach((key) => {
+          const row = document.createElement("tr");
+          const keyCell = document.createElement("th");
+          const valueCell = document.createElement("td");
+
+          keyCell.textContent = key;
+          valueCell.textContent = data[key];
+
+          row.appendChild(keyCell);
+          row.appendChild(valueCell);
+          detailsTable.appendChild(row);
+        });
+
+        resultCard.style.display = "block";
+      } catch (err) {
+        console.error(err);
+        errorEl.textContent = "Failed to fetch wallet data from backend. Check if API is running and URL is correct.";
+        errorEl.style.display = "block";
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    checkBtn.addEventListener("click", fetchWallet);
+    walletInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        fetchWallet();
+      }
+    });
+  </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+
+</body></html>
